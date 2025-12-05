@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Number Guessing Game</title>
+  <link rel="stylesheet" href="randomguess.css">
+</head>
+<body>
+  <div class="game-container">
+    <h1>🎯 Number Guessing Game</h1>
+
+    <label for="difficulty">Select Difficulty:</label>
+    <select id="difficulty">
+      <option value="easy">Easy (1–10, 5 tries)</option>
+      <option value="medium">Medium (1–50, 7 tries)</option>
+      <option value="hard">Hard (1–100, 10 tries)</option>
+    </select>
+    <button id="startBtn">Start Game</button>
+
+    <div id="gameArea" style="display:none;">
+      <p class="info" id="rangeInfo"></p>
+      <input type="number" id="guessInput" placeholder="Enter your guess" />
+      <button id="guessBtn">Guess</button>
+      <p class="message" id="message"></p>
+      <p class="info" id="attemptsInfo"></p>
+    </div>
+
+    <button id="playAgainBtn">🔁 Play Again</button>
+  </div>
+
+  <script>
+    const startBtn = document.getElementById('startBtn');
+    const gameArea = document.getElementById('gameArea');
+    const message = document.getElementById('message');
+    const rangeInfo = document.getElementById('rangeInfo');
+    const attemptsInfo = document.getElementById('attemptsInfo');
+    const guessBtn = document.getElementById('guessBtn');
+    const guessInput = document.getElementById('guessInput');
+    const difficultySelect = document.getElementById('difficulty');
+    const playAgainBtn = document.getElementById('playAgainBtn');
+
+    let randomNumber, maxGuesses, range, attempts;
+
+    startBtn.addEventListener('click', startGame);
+    guessBtn.addEventListener('click', makeGuess);
+    playAgainBtn.addEventListener('click', resetGame);
+
+    function startGame() {
+      const difficulty = difficultySelect.value;
+
+      if (difficulty === 'easy') {
+        range = 10;
+        maxGuesses = 5;
+      } else if (difficulty === 'medium') {
+        range = 50;
+        maxGuesses = 7;
+      } else {
+        range = 100;
+        maxGuesses = 10;
+      }
+
+      randomNumber = Math.floor(Math.random() * range) + 1;
+      attempts = 0;
+
+      gameArea.style.display = 'block';
+      message.textContent = '';
+      rangeInfo.textContent = `Guess a number between 1 and ${range}`;
+      attemptsInfo.textContent = `Attempts left: ${maxGuesses}`;
+      guessInput.value = '';
+      guessInput.focus();
+
+      startBtn.style.display = 'none';
+      difficultySelect.disabled = true;
+      playAgainBtn.style.display = 'none';
+    }
+
+    function makeGuess() {
+      const userGuess = Number(guessInput.value);
+      if (!userGuess || userGuess < 1 || userGuess > range) {
+        message.textContent = `⚠️ Please enter a number between 1 and ${range}.`;
+        message.style.color = 'orange';
+        return;
+      }
+
+      attempts++;
+
+      if (userGuess === randomNumber) {
+        message.textContent = `🎉 Correct! The number was ${randomNumber}. You won in ${attempts} tries!`;
+        message.style.color = 'green';
+        endGame();
+      } else if (attempts >= maxGuesses) {
+        message.textContent = `❌ Game Over! The number was ${randomNumber}.`;
+        message.style.color = 'red';
+        endGame();
+      } else {
+        if (userGuess > randomNumber) {
+          message.textContent = '📉 Too high! Try again.';
+        } else {
+          message.textContent = '📈 Too low! Try again.';
+        }
+        message.style.color = '#333';
+        attemptsInfo.textContent = `Attempts left: ${maxGuesses - attempts}`;
+      }
+
+      guessInput.value = '';
+      guessInput.focus();
+    }
+
+    function endGame() {
+      guessBtn.disabled = true;
+      guessInput.disabled = true;
+      playAgainBtn.style.display = 'inline-block';
+    }
+
+    function resetGame() {
+      guessBtn.disabled = false;
+      guessInput.disabled = false;
+      difficultySelect.disabled = false;
+      gameArea.style.display = 'none';
+      startBtn.style.display = 'inline-block';
+      playAgainBtn.style.display = 'none';
+      message.textContent = '';
+    }
+  </script>
+</body>
+</html>
